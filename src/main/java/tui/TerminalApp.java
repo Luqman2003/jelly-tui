@@ -140,7 +140,7 @@ public class TerminalApp {
         for (MediaItem item : items) {
             String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
             // replace with isSubsequenceMatch once it's implemented for fuzzy search
-            if (filter.isEmpty() || displayName.toLowerCase().contains(filter.toLowerCase())) {
+            if (filter.isEmpty() || isSubsequenceMatch(filter, displayName)) {
                 listBox.addItem(displayName, () -> {
                     selected.set(item);
                     window.close();
@@ -157,4 +157,16 @@ public class TerminalApp {
 //            if searchIndex < search.length() and c == search[searchIndex]:
 //    searchIndex++
 //            return searchIndex == search.length()
+
+    private boolean isSubsequenceMatch(String search, String target) {
+        search = search.toLowerCase();
+        target = target.toLowerCase();
+        int i = 0;
+        for (char c : target.toCharArray()) {
+            if (i < search.length() && c == search.toCharArray()[i]) {
+                i++;
+            }
+        }
+        return i == search.length();
+    }
 }
