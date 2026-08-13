@@ -1,1 +1,1 @@
-<video src="./readme-assets/demo.mov" controls width="600"></video>
+<video src="./readme-assets/demo.mp4" controls width="600"></video>
