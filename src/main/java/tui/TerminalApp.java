@@ -49,7 +49,7 @@ public class TerminalApp {
         List<MediaItem> currItems = library.mediaItems();
 
         try {
-            while (true) {
+            while (true) { // program only ends if we ctrl+c
                 selected = showListScreen(title, currItems, gui, !stack.isEmpty());
 
                 if (selected == null) {
