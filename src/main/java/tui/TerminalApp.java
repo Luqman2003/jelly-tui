@@ -7,6 +7,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.input.KeyStroke;
+import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
 import com.googlecode.lanterna.terminal.DefaultTerminalFactory;
 import player.MpvLauncher;
@@ -14,8 +16,10 @@ import tui.dto.ScreenState;
 
 import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class TerminalApp {
@@ -81,34 +85,76 @@ public class TerminalApp {
     }
 
     public MediaItem showListScreen(String title, List<MediaItem> items, WindowBasedTextGUI gui, boolean showBackOption) throws IOException {
-        Panel panel = new Panel();
+        Panel panel = new Panel(new BorderLayout());
         ActionListBox listBox = new ActionListBox();
         BasicWindow window = new BasicWindow(title);
         AtomicReference<MediaItem> selected = new AtomicReference<>();
+        TextBox searchBox = new TextBox();
         String itemName;
-        int count = 1;
 
-        for (MediaItem item : items) {
-            itemName = item.name();
-            if (item.type().equals("Episode")) {
-                itemName = "Episode " + item.indexNumber();
-            }
-            listBox.addItem(itemName, () -> {
-                selected.set(item);
-                window.close();
-            });
-            count++;
-        }
+        rebuildList(listBox, items, "", selected, window, showBackOption);
 
-        if (showBackOption) {
-            listBox.addItem("..", window::close);
-        }
-
-        panel.addComponent(listBox);
+        panel.addComponent(listBox, BorderLayout.Location.CENTER);
         window.setComponent(panel);
+        window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
         gui.setTheme(theme);
+
+        window.addWindowListener(new WindowListenerAdapter() {
+            @Override
+            public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
+                    panel.addComponent(searchBox, BorderLayout.Location.BOTTOM);
+                    searchBox.takeFocus();
+                    deliverEvent.set(false);
+                }
+                if (keyStroke.getKeyType() == KeyType.Escape) {
+                    panel.removeComponent(searchBox);
+                    searchBox.setText("");
+                    listBox.takeFocus();
+                    deliverEvent.set(false);
+                }
+                if (keyStroke.getKeyType() == KeyType.Enter && window.getFocusedInteractable() == searchBox) {
+                    if (listBox.getItemCount() > 0) {
+                        listBox.setSelectedIndex(0);
+                        listBox.takeFocus();
+                    }
+                    deliverEvent.set(false);
+                }
+            }
+        });
+
+        searchBox.setTextChangeListener((newText, byUser) -> {
+            rebuildList(listBox, items, newText, selected, window, showBackOption);
+        });
         gui.addWindowAndWait(window);
 
         return selected.get();
     }
+
+    private void rebuildList(ActionListBox listBox, List<MediaItem> items, String filter,
+                             AtomicReference<MediaItem> selected, BasicWindow window, boolean showBackOption) {
+        listBox.clearItems();
+        if (showBackOption) {
+            listBox.addItem("..", window::close);
+        }
+        for (MediaItem item : items) {
+            String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
+            // replace with isSubsequenceMatch once it's implemented for fuzzy search
+            if (filter.isEmpty() || displayName.toLowerCase().contains(filter.toLowerCase())) {
+                listBox.addItem(displayName, () -> {
+                    selected.set(item);
+                    window.close();
+                });
+            }
+        }
+    }
+
+//    function isSubsequenceMatch(search, target):
+//    search = search.toLowerCase()
+//    target = target.toLowerCase()
+//    searchIndex = 0
+//            for each character c in target:
+//            if searchIndex < search.length() and c == search[searchIndex]:
+//    searchIndex++
+//            return searchIndex == search.length()
 }

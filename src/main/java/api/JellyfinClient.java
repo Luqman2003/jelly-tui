@@ -15,10 +15,10 @@ import java.util.UUID;
 
 public class JellyfinClient {
 
-     private String serverUrl;
      private final UUID uuid = UUID.randomUUID();
-     private HttpClient client = HttpClient.newHttpClient();
-     private ObjectMapper mapper;
+     private final HttpClient client = HttpClient.newHttpClient();
+     private final ObjectMapper mapper;
+     private String serverUrl;
      private String accessToken;
      private String userId;
 
