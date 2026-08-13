@@ -1,0 +1,21 @@
+jellyfin-tui/
+├── build.gradle (or pom.xml)
+├── src/main/java/com/yourname/jellyfintui/
+│   ├── Main.java
+│   ├── api/
+│   │   ├── JellyfinClient.java       // HTTP calls, auth, token handling
+│   │   ├── JellyfinAuthException.java
+│   │   └── dto/                      // plain records mapping JSON responses
+│   │       ├── AuthResponse.java
+│   │       ├── UserView.java         // libraries
+│   │       ├── MediaItem.java        // movies/shows/episodes
+│   │       └── PlaybackInfo.java
+│   ├── player/
+│   │   └── MpvLauncher.java          // ProcessBuilder wrapper
+│   ├── tui/
+│   │   ├── TerminalApp.java          // Lanterna screen/gui setup + lifecycle
+│   │   ├── LibraryScreen.java
+│   │   ├── ItemListScreen.java       // reused for shows/seasons/episodes
+│   │   └── SearchScreen.java
+│   └── config/
+│       └── AppConfig.java            // server URL, saved token, persisted to ~/.config
