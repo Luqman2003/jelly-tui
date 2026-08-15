@@ -11,6 +11,33 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
+        if (args.length > 0) {
+            switch (args[0]) {
+                case "--help", "-h" -> {
+                    printHelp();
+                    return;
+                }
+                case "--version", "-v" -> {
+                    System.out.println("jelly-cli v0.1.0");
+                    return;
+                }
+                case "--logout" -> {
+                    ConfigManager cm = new ConfigManager();
+                    if (cm.delete()) {
+                        System.out.println("Logged out. Saved credentials cleared.");
+                    } else {
+                        System.out.println("No saved session found.");
+                    }
+                    return;
+                }
+                default -> {
+                    System.err.println("Unknown option: " + args[0]);
+                    printHelp();
+                    System.exit(1);
+                }
+            }
+        }
+
         ConfigManager configManager = new ConfigManager();
         JellyfinClient client = new JellyfinClient();
 
@@ -65,5 +92,16 @@ public class Main {
             System.exit(1);
         }
         return config;
+    }
+
+    private static void printHelp() {
+        System.out.println("jelly-cli - A terminal UI for Jellyfin");
+        System.out.println();
+        System.out.println("Usage: jelly-cli [options]");
+        System.out.println();
+        System.out.println("Options:");
+        System.out.println("  -h, --help      Show this help message");
+        System.out.println("  -v, --version   Show version");
+        System.out.println("  --logout        Clear saved credentials and log out");
     }
 }
