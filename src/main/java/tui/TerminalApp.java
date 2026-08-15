@@ -138,7 +138,7 @@ public class TerminalApp {
             listBox.addItem("..", window::close);
         }
         for (MediaItem item : items) {
-            String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
+            String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() + " - " + item.name() : item.name();
             // replace with isSubsequenceMatch once it's implemented for fuzzy search
             if (filter.isEmpty() || isSubsequenceMatch(filter, displayName)) {
                 listBox.addItem(displayName, () -> {
