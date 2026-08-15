@@ -119,7 +119,11 @@ public class TerminalApp {
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
+        String helpText = "[/] Search  [Enter] Select" + (showBackOption ? "  [Esc] Back" : "");
+        Label helpLabel = new Label(helpText);
+
         panel.addComponent(listBox, BorderLayout.Location.CENTER);
+        panel.addComponent(helpLabel, BorderLayout.Location.BOTTOM);
         window.setComponent(panel);
         window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
         gui.setTheme(theme);
@@ -128,6 +132,7 @@ public class TerminalApp {
             @Override
             public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
+                    panel.removeComponent(helpLabel);
                     panel.addComponent(searchBox, BorderLayout.Location.BOTTOM);
                     searchBox.takeFocus();
                     deliverEvent.set(false);
@@ -135,6 +140,7 @@ public class TerminalApp {
                 if (keyStroke.getKeyType() == KeyType.Escape) {
                     panel.removeComponent(searchBox);
                     searchBox.setText("");
+                    panel.addComponent(helpLabel, BorderLayout.Location.BOTTOM);
                     listBox.takeFocus();
                     deliverEvent.set(false);
                 }
