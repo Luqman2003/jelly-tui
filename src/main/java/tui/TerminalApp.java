@@ -37,6 +37,7 @@ public class TerminalApp {
             TextColor.ANSI.DEFAULT  // guiBackground
     );
     MpvLauncher player;
+    private boolean quitRequested = false;
 
     public TerminalApp(JellyfinClient client) {
         this.client = client;
@@ -55,6 +56,8 @@ public class TerminalApp {
         try {
             while (true) { // program only ends if we ctrl+c
                 selected = showListScreen(title, currItems, gui, !stack.isEmpty());
+
+                if (quitRequested) break;
 
                 if (selected == null) {
                     // back was chosen
@@ -111,6 +114,11 @@ public class TerminalApp {
                     panel.removeComponent(searchBox);
                     searchBox.setText("");
                     listBox.takeFocus();
+                    deliverEvent.set(false);
+                }
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'q' && window.getFocusedInteractable() != searchBox) {
+                    quitRequested = true;
+                    window.close();
                     deliverEvent.set(false);
                 }
                 if (keyStroke.getKeyType() == KeyType.Enter && window.getFocusedInteractable() == searchBox) {
