@@ -7,6 +7,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -65,11 +67,34 @@ public class TerminalApp {
                 }
 
                 if (selected.type().equals("Episode")) {
-                    String streamUrl = client.getStreamUrl(selected.id());
-                    player.play(streamUrl);
-                    screen.clear();
-                    screen.refresh(Screen.RefreshType.COMPLETE);
-                    continue; //time to play
+                    MediaItem episodeToPlay = selected;
+
+                    while (episodeToPlay != null) {
+                        String streamUrl = client.getStreamUrl(episodeToPlay.id());
+                        player.play(streamUrl);
+                        screen.clear();
+                        screen.refresh(Screen.RefreshType.COMPLETE);
+
+                        // Find index of current episode and check for next
+                        int currentIndex = currItems.indexOf(episodeToPlay);
+                        if (currentIndex < 0 || currentIndex + 1 >= currItems.size()) break;
+
+                        MediaItem next = currItems.get(currentIndex + 1);
+                        if (!next.type().equals("Episode")) break;
+
+                        String nextLabel = "Episode " + next.indexNumber() + " - " + next.name();
+                        MessageDialogButton result = new MessageDialogBuilder()
+                                .setTitle("Next Episode")
+                                .setText("Play " + nextLabel + "?")
+                                .addButton(MessageDialogButton.Yes)
+                                .addButton(MessageDialogButton.No)
+                                .build()
+                                .showDialog(gui);
+
+                        if (result != MessageDialogButton.Yes) break;
+                        episodeToPlay = next;
+                    }
+                    continue;
                 }
 
                 // drill in
