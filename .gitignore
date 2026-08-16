@@ -31,11 +31,15 @@ target/
 build/
 !**/src/main/**/build/
 !**/src/test/**/build/
-
+### Claude ###
+.claude
 ### VS Code ###
 .vscode/
 
 ### Mac OS ###
 .DS_Store
 
-./file-structure.txt
+### build artifact from maven ###
+dependency-reduced-pom.xml
+
+file-structure.txt
