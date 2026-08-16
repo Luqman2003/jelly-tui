@@ -12,24 +12,33 @@ A lightweight terminal UI for browsing and playing media from a [Jellyfin](https
 - Session persistence — credentials are saved locally so you only log in once
 - Password input is masked during login
 
-## Requirements
+## Install
 
-- Java 21+
-- [mpv](https://mpv.io/installation/) (for media playback)
-- A running Jellyfin server
+### Homebrew (macOS)
 
-## Build
+```bash
+brew tap Luqman2003/jelly-tui
+brew install jelly-tui
+```
+
+### Build from source
+
+Requires Java 21+.
 
 ```bash
 mvn package
+java -jar target/jelly-tui-1.0.0.jar
 ```
 
-This produces a shaded JAR at `target/jelly-tui-1.0.0.jar`.
+## Requirements
+
+- [mpv](https://mpv.io/installation/) (for media playback)
+- A running Jellyfin server
 
 ## Usage
 
 ```bash
-java -jar target/jelly-tui-1.0.0.jar
+jelly-tui
 ```
 
 On first run, you'll be prompted for your Jellyfin username, password, and server URL. Credentials are saved to `~/.config/jelly-cli/config.json` for future sessions.
