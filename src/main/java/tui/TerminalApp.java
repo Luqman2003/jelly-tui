@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TerminalApp {
 
     private JellyfinClient client;
+    private boolean quitSelected = false;
     Deque<ScreenState> stack;
     private final Theme theme = SimpleTheme.makeTheme(
             true, // activeIsBold
@@ -55,8 +56,12 @@ public class TerminalApp {
         List<MediaItem> currItems = library.mediaItems();
 
         try {
-            while (true) { // program only ends if we ctrl+c
+            while (true) {
                 selected = showListScreen(title, currItems, gui, !stack.isEmpty());
+
+                if (quitSelected) {
+                    break;
+                }
 
                 if (selected == null) {
                     // back was chosen
@@ -119,7 +124,7 @@ public class TerminalApp {
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
-        String helpText = "[/] Search  [Enter] Select" + (showBackOption ? "  [Esc] Back" : "");
+        String helpText = "[/] Search  [Enter] Select [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
         Label helpLabel = new Label(helpText);
 
         panel.addComponent(listBox, BorderLayout.Location.CENTER);
@@ -131,6 +136,12 @@ public class TerminalApp {
         window.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'q' && !window.getFocusedInteractable().equals(searchBox)) {
+                    System.out.println(keyStroke.getCharacter());
+                    window.close();
+                    quitSelected = true;
+                }
+
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
                     panel.removeComponent(helpLabel);
                     panel.addComponent(searchBox, BorderLayout.Location.BOTTOM);
@@ -179,15 +190,6 @@ public class TerminalApp {
             }
         }
     }
-
-//    function isSubsequenceMatch(search, target):
-//    search = search.toLowerCase()
-//    target = target.toLowerCase()
-//    searchIndex = 0
-//            for each character c in target:
-//            if searchIndex < search.length() and c == search[searchIndex]:
-//    searchIndex++
-//            return searchIndex == search.length()
 
     private boolean isSubsequenceMatch(String search, String target) {
         search = search.toLowerCase();
