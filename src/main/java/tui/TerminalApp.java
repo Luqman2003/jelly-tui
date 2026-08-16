@@ -145,7 +145,10 @@ public class TerminalApp {
                     deliverEvent.set(false);
                 }
                 if (keyStroke.getKeyType() == KeyType.Enter && window.getFocusedInteractable() == searchBox) {
-                    if (listBox.getItemCount() > 0) {
+                    if (listBox.getItemCount() > 1) {
+                        listBox.setSelectedIndex(1);
+                        listBox.takeFocus();
+                    } else if (listBox.getItemCount() > 0 && listBox.getItemCount() < 2) {
                         listBox.setSelectedIndex(0);
                         listBox.takeFocus();
                     }
@@ -166,7 +169,7 @@ public class TerminalApp {
                              AtomicReference<MediaItem> selected, BasicWindow window, boolean showBackOption) {
         listBox.clearItems();
         if (showBackOption) {
-            listBox.addItem("..", window::close);
+            listBox.addItem("...", window::close);
         }
         for (MediaItem item : items) {
             String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
@@ -179,15 +182,6 @@ public class TerminalApp {
             }
         }
     }
-
-//    function isSubsequenceMatch(search, target):
-//    search = search.toLowerCase()
-//    target = target.toLowerCase()
-//    searchIndex = 0
-//            for each character c in target:
-//            if searchIndex < search.length() and c == search[searchIndex]:
-//    searchIndex++
-//            return searchIndex == search.length()
 
     private boolean isSubsequenceMatch(String search, String target) {
         search = search.toLowerCase();
