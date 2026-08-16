@@ -182,15 +182,21 @@ public class TerminalApp {
         if (showBackOption) {
             listBox.addItem("...", window::close);
         }
+        int matchCount = 0;
         for (MediaItem item : items) {
             String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
             // replace with isSubsequenceMatch once it's implemented for fuzzy search
             if (filter.isEmpty() || isSubsequenceMatch(filter, displayName)) {
+                matchCount++;
                 listBox.addItem(displayName, () -> {
                     selected.set(item);
                     window.close();
                 });
             }
+        }
+        if (matchCount == 0) {
+            String message = filter.isEmpty() ? "(No items found)" : "(No matches for \"" + filter + "\")";
+            listBox.addItem(message, () -> {});
         }
     }
 
