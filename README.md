@@ -41,7 +41,7 @@ java -jar target/jelly-tui-1.0.0.jar
 jelly-tui
 ```
 
-On first run, you'll be prompted for your Jellyfin username, password, and server URL. Credentials are saved to `~/.config/jelly-cli/config.json` for future sessions.
+On first run, you'll be prompted for your Jellyfin username, password, and server URL. Credentials are saved to `~/.config/jelly-tui/config.json` for future sessions.
 
 ## Keybindings
 
