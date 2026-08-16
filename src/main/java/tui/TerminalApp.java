@@ -71,7 +71,7 @@ public class TerminalApp {
                     continue;
                 }
 
-                if (selected.type().equals("Episode")) {
+                if (selected.type().equals("Episode") || selected.type().equals("Movie")) {
                     MediaItem episodeToPlay = selected;
 
                     while (episodeToPlay != null) {
@@ -120,7 +120,6 @@ public class TerminalApp {
         BasicWindow window = new BasicWindow(title);
         AtomicReference<MediaItem> selected = new AtomicReference<>();
         TextBox searchBox = new TextBox();
-        String itemName;
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
