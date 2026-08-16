@@ -89,3 +89,41 @@ jobs:
 
           **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ steps.version.outputs.current }}...v${VERSION}" \
             --latest
+
+      - name: Update Homebrew formula
+        if: steps.bump.outputs.bump != 'none'
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+          VERSION: ${{ steps.next.outputs.version }}
+        run: |
+          JAR=$(ls target/jelly-tui-*.jar | grep -v original | head -1)
+          SHA=$(shasum -a 256 "$JAR" | awk '{print $1}')
+
+          FORMULA=$(cat <<RUBY
+          class JellyTui < Formula
+            desc "Terminal Jellyfin client"
+            homepage "https://github.com/Luqman2003/jelly-tui"
+            url "https://github.com/Luqman2003/jelly-tui/releases/download/v${VERSION}/jelly-tui-${VERSION}.jar"
+            sha256 "${SHA}"
+
+            depends_on "openjdk@21"
+            depends_on "mpv"
+
+            def install
+              libexec.install "jelly-tui-${VERSION}.jar" => "jelly-tui.jar"
+              (bin/"jelly-tui").write <<~EOS
+                #!/bin/bash
+                exec "#{Formula["openjdk@21"].opt_bin}/java" -jar "#{libexec}/jelly-tui.jar" "$@"
+              EOS
+            end
+          end
+          RUBY
+          )
+
+          FILE_SHA=$(gh api repos/Luqman2003/homebrew-jelly-tui/contents/Formula/jelly-tui.rb --jq '.sha')
+
+          gh api repos/Luqman2003/homebrew-jelly-tui/contents/Formula/jelly-tui.rb \
+            -X PUT \
+            -f message="Update formula to v${VERSION}" \
+            -f content="$(echo "$FORMULA" | base64)" \
+            -f sha="$FILE_SHA"
