@@ -31,6 +31,9 @@ public class JellyfinClient {
      }
 
      public AuthResponse auth(String username, String password, String serverUrl) throws IOException, InterruptedException {
+          while (serverUrl.endsWith("/")) {
+               serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
+          }
           AuthRequest credentials = new AuthRequest(username, password);
           try {
                HttpRequest req = HttpRequest.newBuilder()
@@ -134,6 +137,9 @@ public class JellyfinClient {
      public void loadSession(Config config) {
           this.accessToken = config.accessToken();
           this.serverUrl = config.serverUrl();
+          while (this.serverUrl.endsWith("/")) {
+               this.serverUrl = this.serverUrl.substring(0, this.serverUrl.length() - 1);
+          }
           this.userId = config.userId();
      }
 

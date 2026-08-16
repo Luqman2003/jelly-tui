@@ -47,6 +47,9 @@ public class Main {
         String password = scanner.nextLine();
         System.out.print("Server URL: ");
         String serverUrl = scanner.nextLine();
+        while (serverUrl.endsWith("/")) {
+            serverUrl = serverUrl.substring(0, serverUrl.length() - 1);
+        }
 
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
