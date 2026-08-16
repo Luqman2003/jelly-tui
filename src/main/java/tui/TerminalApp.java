@@ -76,7 +76,18 @@ public class TerminalApp {
 
                     while (episodeToPlay != null) {
                         String streamUrl = client.getStreamUrl(episodeToPlay.id());
-                        player.play(streamUrl);
+                        int exitCode = player.play(streamUrl);
+                        if (exitCode == -1) {
+                            new MessageDialogBuilder()
+                                    .setTitle("Error")
+                                    .setText("mpv is not installed. Install it from https://mpv.io")
+                                    .addButton(MessageDialogButton.OK)
+                                    .build()
+                                    .showDialog(gui);
+                            screen.clear();
+                            screen.refresh(Screen.RefreshType.COMPLETE);
+                            break;
+                        }
                         screen.clear();
                         screen.refresh(Screen.RefreshType.COMPLETE);
 
