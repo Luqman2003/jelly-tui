@@ -15,8 +15,8 @@ public class ConfigManager {
 
     public ConfigManager() {
         this.mapper = new ObjectMapper();
-        // ~/.config/jelly-cli/config.json
-        this.path = Paths.get(System.getProperty("user.home"), ".config", "jelly-cli", "config.json");
+        // ~/.config/jelly-tui/config.json
+        this.path = Paths.get(System.getProperty("user.home"), ".config", "jelly-tui", "config.json");
     }
 
     public Config load() throws IOException {
