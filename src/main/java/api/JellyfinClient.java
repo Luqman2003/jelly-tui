@@ -11,12 +11,15 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.UUID;
 
 public class JellyfinClient {
 
      private final UUID uuid = UUID.randomUUID();
-     private final HttpClient client = HttpClient.newHttpClient();
+     private final HttpClient client = HttpClient.newBuilder()
+             .connectTimeout(Duration.ofSeconds(10))
+             .build();
      private final ObjectMapper mapper;
      private String serverUrl;
      private String accessToken;
@@ -39,6 +42,7 @@ public class JellyfinClient {
                        .header("Content-Type", "application/json")
                        .header("Authorization", generateAuthHeader())
                        .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(credentials)))
+                       .timeout(Duration.ofSeconds(30))
                        .build();
                HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
                int statusCode = response.statusCode();
@@ -68,6 +72,7 @@ public class JellyfinClient {
                        .header("Accept", "application/json")
                        .header("X-Emby-Token", this.accessToken)
                        .GET()
+                       .timeout(Duration.ofSeconds(30))
                        .build();
 
                HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
@@ -95,6 +100,7 @@ public class JellyfinClient {
                        .header("Accept", "application/json")
                        .header("X-Emby-Token", this.accessToken)
                        .GET()
+                       .timeout(Duration.ofSeconds(30))
                        .build();
 
                HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
@@ -118,6 +124,7 @@ public class JellyfinClient {
                        .header("Accept", "application/json")
                        .header("X-Emby-Token", accessToken) // access token from client, not this object's field
                        .GET()
+                       .timeout(Duration.ofSeconds(30))
                        .build();
 
                HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
