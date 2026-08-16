@@ -71,7 +71,15 @@ public class TerminalApp {
                     continue;
                 }
 
-                if (selected.type().equals("Episode") || selected.type().equals("Movie")) {
+                if (selected.type().equals("Movie")) {
+                    String streamUrl = client.getStreamUrl(selected.id());
+                    player.play(streamUrl);
+                    screen.clear();
+                    screen.refresh(Screen.RefreshType.COMPLETE);
+                    continue;
+                }
+
+                if (selected.type().equals("Episode")) {
                     MediaItem episodeToPlay = selected;
 
                     while (episodeToPlay != null) {
