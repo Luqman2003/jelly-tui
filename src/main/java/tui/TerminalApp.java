@@ -7,6 +7,8 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.graphics.SimpleTheme;
 import com.googlecode.lanterna.graphics.Theme;
 import com.googlecode.lanterna.gui2.*;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
 import com.googlecode.lanterna.screen.Screen;
@@ -25,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class TerminalApp {
 
     private JellyfinClient client;
+    private boolean quitSelected = false;
     Deque<ScreenState> stack;
     private final Theme theme = SimpleTheme.makeTheme(
             true, // activeIsBold
@@ -53,8 +56,12 @@ public class TerminalApp {
         List<MediaItem> currItems = library.mediaItems();
 
         try {
-            while (true) { // program only ends if we ctrl+c
+            while (true) {
                 selected = showListScreen(title, currItems, gui, !stack.isEmpty());
+
+                if (quitSelected) {
+                    break;
+                }
 
                 if (selected == null) {
                     // back was chosen
@@ -70,6 +77,35 @@ public class TerminalApp {
                     screen.clear();
                     screen.refresh(Screen.RefreshType.COMPLETE);
                     continue; //time to play
+                if (selected.type().equals("Episode")) {
+                    MediaItem episodeToPlay = selected;
+
+                    while (episodeToPlay != null) {
+                        String streamUrl = client.getStreamUrl(episodeToPlay.id());
+                        player.play(streamUrl);
+                        screen.clear();
+                        screen.refresh(Screen.RefreshType.COMPLETE);
+
+                        // Find index of current episode and check for next
+                        int currentIndex = currItems.indexOf(episodeToPlay);
+                        if (currentIndex < 0 || currentIndex + 1 >= currItems.size()) break;
+
+                        MediaItem next = currItems.get(currentIndex + 1);
+                        if (!next.type().equals("Episode")) break;
+
+                        String nextLabel = "Episode " + next.indexNumber() + " - " + next.name();
+                        MessageDialogButton result = new MessageDialogBuilder()
+                                .setTitle("Next Episode")
+                                .setText("Play " + nextLabel + "?")
+                                .addButton(MessageDialogButton.Yes)
+                                .addButton(MessageDialogButton.No)
+                                .build()
+                                .showDialog(gui);
+
+                        if (result != MessageDialogButton.Yes) break;
+                        episodeToPlay = next;
+                    }
+                    continue;
                 }
 
                 // drill in
@@ -94,7 +130,11 @@ public class TerminalApp {
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
+        String helpText = "[/] Search  [Enter] Select [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
+        Label helpLabel = new Label(helpText);
+
         panel.addComponent(listBox, BorderLayout.Location.CENTER);
+        panel.addComponent(helpLabel, BorderLayout.Location.BOTTOM);
         window.setComponent(panel);
         window.setHints(Collections.singletonList(Window.Hint.FULL_SCREEN));
         gui.setTheme(theme);
@@ -102,7 +142,14 @@ public class TerminalApp {
         window.addWindowListener(new WindowListenerAdapter() {
             @Override
             public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'q' && !window.getFocusedInteractable().equals(searchBox)) {
+                    System.out.println(keyStroke.getCharacter());
+                    window.close();
+                    quitSelected = true;
+                }
+
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
+                    panel.removeComponent(helpLabel);
                     panel.addComponent(searchBox, BorderLayout.Location.BOTTOM);
                     searchBox.takeFocus();
                     deliverEvent.set(false);
@@ -110,11 +157,15 @@ public class TerminalApp {
                 if (keyStroke.getKeyType() == KeyType.Escape) {
                     panel.removeComponent(searchBox);
                     searchBox.setText("");
+                    panel.addComponent(helpLabel, BorderLayout.Location.BOTTOM);
                     listBox.takeFocus();
                     deliverEvent.set(false);
                 }
                 if (keyStroke.getKeyType() == KeyType.Enter && window.getFocusedInteractable() == searchBox) {
-                    if (listBox.getItemCount() > 0) {
+                    if (listBox.getItemCount() > 1) {
+                        listBox.setSelectedIndex(1);
+                        listBox.takeFocus();
+                    } else if (listBox.getItemCount() > 0 && listBox.getItemCount() < 2) {
                         listBox.setSelectedIndex(0);
                         listBox.takeFocus();
                     }
@@ -135,7 +186,7 @@ public class TerminalApp {
                              AtomicReference<MediaItem> selected, BasicWindow window, boolean showBackOption) {
         listBox.clearItems();
         if (showBackOption) {
-            listBox.addItem("..", window::close);
+            listBox.addItem("...", window::close);
         }
         for (MediaItem item : items) {
             String displayName = item.type().equals("Episode") ? "Episode " + item.indexNumber() : item.name();
@@ -148,15 +199,6 @@ public class TerminalApp {
             }
         }
     }
-
-//    function isSubsequenceMatch(search, target):
-//    search = search.toLowerCase()
-//    target = target.toLowerCase()
-//    searchIndex = 0
-//            for each character c in target:
-//            if searchIndex < search.length() and c == search[searchIndex]:
-//    searchIndex++
-//            return searchIndex == search.length()
 
     private boolean isSubsequenceMatch(String search, String target) {
         search = search.toLowerCase();
