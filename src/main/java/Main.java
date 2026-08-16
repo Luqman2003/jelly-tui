@@ -34,6 +34,10 @@ public class Main {
 
         // At this point, config is correct under both cases and client is fine
         ItemsResponse library = client.getLibraries();
+        if (library == null || library.mediaItems() == null) {
+            System.out.println("Failed to load libraries from server. Please check your connection and try again.");
+            System.exit(1);
+        }
         TerminalApp terminalApp = new TerminalApp(client);
         terminalApp.run(library);
 

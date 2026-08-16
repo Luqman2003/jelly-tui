@@ -111,9 +111,19 @@ public class TerminalApp {
                 }
 
                 // drill in
+                ItemsResponse nextItems = client.getItems(selected.id());
+                if (nextItems == null || nextItems.mediaItems() == null) {
+                    new MessageDialogBuilder()
+                            .setTitle("Error")
+                            .setText("Failed to load items. Please check your connection and try again.")
+                            .addButton(MessageDialogButton.OK)
+                            .build()
+                            .showDialog(gui);
+                    continue;
+                }
                 stack.push(new ScreenState(title, currItems));
                 title = selected.name();
-                currItems = client.getItems(selected.id()).mediaItems();
+                currItems = nextItems.mediaItems();
             }
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
