@@ -6,6 +6,7 @@ import config.Config;
 import config.ConfigManager;
 import tui.TerminalApp;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.Scanner;
 
@@ -39,14 +40,25 @@ public class Main {
     }
 
     private static Config authenticate(JellyfinClient client, ConfigManager configManager) {
-        Scanner scanner = new Scanner(System.in);
+        Console console = System.console();
         Config config = null;
-        System.out.print("Username: ");
-        String username = scanner.nextLine();
-        System.out.print("Password: ");
-        String password = scanner.nextLine();
-        System.out.print("Server URL: ");
-        String serverUrl = scanner.nextLine();
+        String username;
+        String password;
+        String serverUrl;
+
+        if (console != null) {
+            username = console.readLine("Username: ");
+            password = new String(console.readPassword("Password: "));
+            serverUrl = console.readLine("Server URL: ");
+        } else {
+            Scanner scanner = new Scanner(System.in);
+            System.out.print("Username: ");
+            username = scanner.nextLine();
+            System.out.print("Password: ");
+            password = scanner.nextLine();
+            System.out.print("Server URL: ");
+            serverUrl = scanner.nextLine();
+        }
 
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
