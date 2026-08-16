@@ -71,6 +71,14 @@ public class TerminalApp {
                     continue;
                 }
 
+                if (selected.type().equals("Movie")) {
+                    String streamUrl = client.getStreamUrl(selected.id());
+                    player.play(streamUrl);
+                    screen.clear();
+                    screen.refresh(Screen.RefreshType.COMPLETE);
+                    continue;
+                }
+
                 if (selected.type().equals("Episode")) {
                     MediaItem episodeToPlay = selected;
 
@@ -120,7 +128,6 @@ public class TerminalApp {
         BasicWindow window = new BasicWindow(title);
         AtomicReference<MediaItem> selected = new AtomicReference<>();
         TextBox searchBox = new TextBox();
-        String itemName;
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
