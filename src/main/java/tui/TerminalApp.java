@@ -131,7 +131,7 @@ public class TerminalApp {
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
-        String helpText = "[/] Search  [Enter] Select [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
+        String helpText = "[/] Search  [j/k] Down/Up  [Enter] Select [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
         Label helpLabel = new Label(helpText);
 
         panel.addComponent(listBox, BorderLayout.Location.CENTER);
@@ -160,6 +160,20 @@ public class TerminalApp {
                     searchBox.setText("");
                     panel.addComponent(helpLabel, BorderLayout.Location.BOTTOM);
                     listBox.takeFocus();
+                    deliverEvent.set(false);
+                }
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'j' && window.getFocusedInteractable() == listBox) {
+                    int index = listBox.getSelectedIndex();
+                    if (index >= 0 && index < listBox.getItemCount() - 1) {
+                        listBox.setSelectedIndex(index + 1);
+                    }
+                    deliverEvent.set(false);
+                }
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'k' && window.getFocusedInteractable() == listBox) {
+                    int index = listBox.getSelectedIndex();
+                    if (index > 0) {
+                        listBox.setSelectedIndex(index - 1);
+                    }
                     deliverEvent.set(false);
                 }
                 if (keyStroke.getKeyType() == KeyType.Enter && window.getFocusedInteractable() == searchBox) {
