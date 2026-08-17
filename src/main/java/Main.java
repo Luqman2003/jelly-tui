@@ -60,6 +60,9 @@ public class Main {
             serverUrl = scanner.nextLine();
         }
 
+        username = username.trim();
+        serverUrl = serverUrl.trim();
+
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
             if (authResponse == null) { // bad credentials
