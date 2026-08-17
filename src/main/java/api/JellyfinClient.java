@@ -53,6 +53,8 @@ public class JellyfinClient {
                     this.serverUrl = serverUrl;
                     return auth;
                }
+          } catch (java.net.ConnectException | java.net.UnknownHostException | java.net.http.HttpConnectTimeoutException e) {
+               System.out.println("Could not reach server at " + serverUrl + ". Check the server URL and your network connection.");
           } catch (Exception e) {
                // TODO: implement better logging
                e.printStackTrace();
