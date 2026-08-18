@@ -73,9 +73,17 @@ public class TerminalApp {
 
                 if (selected.type().equals("Movie")) {
                     String streamUrl = client.getStreamUrl(selected.id());
-                    player.play(streamUrl);
+                    int exitCode = player.play(streamUrl);
                     screen.clear();
                     screen.refresh(Screen.RefreshType.COMPLETE);
+                    if (exitCode != 0) {
+                        new MessageDialogBuilder()
+                                .setTitle("Playback Warning")
+                                .setText("mpv exited with a non-zero status (code " + exitCode + ").")
+                                .addButton(MessageDialogButton.OK)
+                                .build()
+                                .showDialog(gui);
+                    }
                     continue;
                 }
 
@@ -84,9 +92,18 @@ public class TerminalApp {
 
                     while (episodeToPlay != null) {
                         String streamUrl = client.getStreamUrl(episodeToPlay.id());
-                        player.play(streamUrl);
+                        int exitCode = player.play(streamUrl);
                         screen.clear();
                         screen.refresh(Screen.RefreshType.COMPLETE);
+                        if (exitCode != 0) {
+                            new MessageDialogBuilder()
+                                    .setTitle("Playback Warning")
+                                    .setText("mpv exited with a non-zero status (code " + exitCode + ").")
+                                    .addButton(MessageDialogButton.OK)
+                                    .build()
+                                    .showDialog(gui);
+                            break;
+                        }
 
                         // Find index of current episode and check for next
                         int currentIndex = currItems.indexOf(episodeToPlay);
