@@ -65,8 +65,8 @@ public class Main {
 
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
-            if (authResponse == null) { // bad credentials
-                System.out.println("Bad credentials");
+            if (authResponse == null) {
+                System.out.println("Login failed. Please verify your username, password, and server URL.");
                 System.exit(1);
             }
             // successful jellyfinauth
