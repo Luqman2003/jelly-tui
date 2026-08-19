@@ -4,9 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.PosixFilePermissions;
 
 public class ConfigManager {
 
@@ -37,6 +39,10 @@ public class ConfigManager {
         try {
             Files.createDirectories(this.path.getParent());
             mapper.writeValue(this.path.toFile(), config);
+            // config.json contains a plaintext access token, so restrict it to the owner only
+            if (FileSystems.getDefault().supportedFileAttributeViews().contains("posix")) {
+                Files.setPosixFilePermissions(this.path, PosixFilePermissions.fromString("rw-------"));
+            }
             return true;
         } catch (Exception e) {
             e.printStackTrace();
