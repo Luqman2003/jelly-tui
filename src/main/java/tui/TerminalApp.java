@@ -111,6 +111,9 @@ public class TerminalApp {
                 }
 
                 // drill in
+                screen.clear();
+                screen.newTextGraphics().putString(0, 0, "Loading " + selected.name() + "...");
+                screen.refresh();
                 stack.push(new ScreenState(title, currItems));
                 title = selected.name();
                 currItems = client.getItems(selected.id()).mediaItems();
