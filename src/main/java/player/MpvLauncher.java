@@ -16,4 +16,11 @@ public class MpvLauncher {
                 .start()
                 .waitFor();
     }
+
+    public int play(String streamUrl, String title) throws IOException, InterruptedException {
+        return new ProcessBuilder("mpv", "--title=" + title, streamUrl)
+                .inheritIO()
+                .start()
+                .waitFor();
+    }
 }
