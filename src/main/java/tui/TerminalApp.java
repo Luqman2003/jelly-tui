@@ -73,6 +73,9 @@ public class TerminalApp {
 
                 if (selected.type().equals("Movie")) {
                     String streamUrl = client.getStreamUrl(selected.id());
+                    screen.clear();
+                    screen.newTextGraphics().putString(0, 0, "Playing " + selected.name() + "...");
+                    screen.refresh();
                     player.play(streamUrl);
                     screen.clear();
                     screen.refresh(Screen.RefreshType.COMPLETE);
@@ -84,6 +87,9 @@ public class TerminalApp {
 
                     while (episodeToPlay != null) {
                         String streamUrl = client.getStreamUrl(episodeToPlay.id());
+                        screen.clear();
+                        screen.newTextGraphics().putString(0, 0, "Playing Episode " + episodeToPlay.indexNumber() + " - " + episodeToPlay.name() + "...");
+                        screen.refresh();
                         player.play(streamUrl);
                         screen.clear();
                         screen.refresh(Screen.RefreshType.COMPLETE);
