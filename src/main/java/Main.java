@@ -63,6 +63,11 @@ public class Main {
         username = username.trim();
         serverUrl = serverUrl.trim();
 
+        if (!serverUrl.isEmpty() && !serverUrl.matches("(?i)^https?://.*")) {
+            serverUrl = "http://" + serverUrl;
+            System.out.println("No protocol specified, assuming " + serverUrl);
+        }
+
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
             if (authResponse == null) { // bad credentials
