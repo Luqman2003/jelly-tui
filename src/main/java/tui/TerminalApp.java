@@ -41,8 +41,11 @@ public class TerminalApp {
     );
     MpvLauncher player;
 
-    public TerminalApp(JellyfinClient client) {
+    private final String username;
+
+    public TerminalApp(JellyfinClient client, String username) {
         this.client = client;
+        this.username = username;
         this.stack = new ArrayDeque<>();
         this.player = new MpvLauncher();
     }
@@ -51,7 +54,7 @@ public class TerminalApp {
         Screen screen = new DefaultTerminalFactory().createScreen();
         screen.startScreen();
         WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
-        String title = "Jellyfin TUI";
+        String title = username != null && !username.isEmpty() ? "Jellyfin TUI - " + username : "Jellyfin TUI";
         MediaItem selected;
         List<MediaItem> currItems = library.mediaItems();
 
