@@ -63,6 +63,11 @@ public class Main {
         username = username.trim();
         serverUrl = serverUrl.trim();
 
+        if (username.isEmpty() || password.isEmpty() || serverUrl.isEmpty()) {
+            System.out.println("Username, password, and server URL are all required");
+            System.exit(1);
+        }
+
         try {
             AuthResponse authResponse = client.auth(username, password, serverUrl);
             if (authResponse == null) { // bad credentials
