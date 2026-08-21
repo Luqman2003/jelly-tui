@@ -34,7 +34,7 @@ public class Main {
 
         // At this point, config is correct under both cases and client is fine
         ItemsResponse library = client.getLibraries();
-        TerminalApp terminalApp = new TerminalApp(client);
+        TerminalApp terminalApp = new TerminalApp(client, config.username());
         terminalApp.run(library);
 
     }
