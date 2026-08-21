@@ -28,6 +28,7 @@ public class TerminalApp {
 
     private JellyfinClient client;
     private boolean quitSelected = false;
+    private boolean refreshRequested = false;
     Deque<ScreenState> stack;
     private final Theme theme = SimpleTheme.makeTheme(
             true, // activeIsBold
@@ -54,6 +55,7 @@ public class TerminalApp {
         String title = "Jellyfin TUI";
         MediaItem selected;
         List<MediaItem> currItems = library.mediaItems();
+        String currentParentId = null;
 
         try {
             while (true) {
@@ -63,11 +65,21 @@ public class TerminalApp {
                     break;
                 }
 
+                if (refreshRequested) {
+                    refreshRequested = false;
+                    ItemsResponse refreshed = currentParentId == null
+                            ? client.getLibraries()
+                            : client.getItems(currentParentId);
+                    currItems = refreshed.mediaItems();
+                    continue;
+                }
+
                 if (selected == null) {
                     // back was chosen
                     ScreenState prev = stack.pop();
                     title = prev.title();
                     currItems = prev.items();
+                    currentParentId = prev.parentId();
                     continue;
                 }
 
@@ -111,8 +123,9 @@ public class TerminalApp {
                 }
 
                 // drill in
-                stack.push(new ScreenState(title, currItems));
+                stack.push(new ScreenState(title, currItems, currentParentId));
                 title = selected.name();
+                currentParentId = selected.id();
                 currItems = client.getItems(selected.id()).mediaItems();
             }
         } catch (InterruptedException e) {
@@ -131,7 +144,7 @@ public class TerminalApp {
 
         rebuildList(listBox, items, "", selected, window, showBackOption);
 
-        String helpText = "[/] Search  [Enter] Select [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
+        String helpText = "[/] Search  [Enter] Select  [r] Refresh  [q] Quit" + (showBackOption ? "  [Esc] Back" : "");
         Label helpLabel = new Label(helpText);
 
         panel.addComponent(listBox, BorderLayout.Location.CENTER);
@@ -147,6 +160,11 @@ public class TerminalApp {
                     System.out.println(keyStroke.getCharacter());
                     window.close();
                     quitSelected = true;
+                }
+
+                if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'r' && !window.getFocusedInteractable().equals(searchBox)) {
+                    refreshRequested = true;
+                    window.close();
                 }
 
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
