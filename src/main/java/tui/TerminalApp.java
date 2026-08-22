@@ -154,9 +154,18 @@ public class TerminalApp {
             @Override
             public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == 'q' && !window.getFocusedInteractable().equals(searchBox)) {
-                    System.out.println(keyStroke.getCharacter());
-                    window.close();
-                    quitSelected = true;
+                    MessageDialogButton confirm = new MessageDialogBuilder()
+                            .setTitle("Quit")
+                            .setText("Are you sure you want to quit?")
+                            .addButton(MessageDialogButton.Yes)
+                            .addButton(MessageDialogButton.No)
+                            .build()
+                            .showDialog(gui);
+                    if (confirm == MessageDialogButton.Yes) {
+                        window.close();
+                        quitSelected = true;
+                    }
+                    deliverEvent.set(false);
                 }
 
                 if (keyStroke.getCharacter() != null && keyStroke.getCharacter() == '/') {
