@@ -43,13 +43,4 @@ public class ConfigManager {
         }
         return false;
     }
-
-    public boolean delete() {
-        try {
-            return Files.deleteIfExists(this.path);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
 }
