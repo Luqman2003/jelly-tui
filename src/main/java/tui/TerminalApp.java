@@ -50,6 +50,15 @@ public class TerminalApp {
     public void run(ItemsResponse library) throws IOException {
         Screen screen = new DefaultTerminalFactory().createScreen();
         screen.startScreen();
+        // Without this, a Ctrl+C or other abrupt JVM exit skips the finally
+        // block below and leaves the terminal stuck in raw/alternate-screen mode.
+        Thread restoreTerminalHook = new Thread(() -> {
+            try {
+                screen.stopScreen();
+            } catch (Exception ignored) {
+            }
+        });
+        Runtime.getRuntime().addShutdownHook(restoreTerminalHook);
         WindowBasedTextGUI gui = new MultiWindowTextGUI(screen);
         String title = "Jellyfin TUI";
         MediaItem selected;
@@ -129,6 +138,7 @@ public class TerminalApp {
             throw new RuntimeException(e);
         } finally {
             screen.stopScreen();
+            Runtime.getRuntime().removeShutdownHook(restoreTerminalHook);
         }
     }
 
