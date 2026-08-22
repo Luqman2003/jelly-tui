@@ -135,7 +135,9 @@ public class TerminalApp {
     public MediaItem showListScreen(String title, List<MediaItem> items, WindowBasedTextGUI gui, boolean showBackOption) throws IOException {
         Panel panel = new Panel(new BorderLayout());
         ActionListBox listBox = new ActionListBox();
-        BasicWindow window = new BasicWindow(title);
+        String windowTitle = items.isEmpty() ? title
+                : title + " (" + items.size() + (items.size() == 1 ? " item)" : " items)");
+        BasicWindow window = new BasicWindow(windowTitle);
         AtomicReference<MediaItem> selected = new AtomicReference<>();
         TextBox searchBox = new TextBox();
 
