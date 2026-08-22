@@ -8,6 +8,8 @@ import tui.TerminalApp;
 
 import java.io.Console;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 import java.util.Scanner;
 
 public class Main {
@@ -19,7 +21,7 @@ public class Main {
                     return;
                 }
                 case "--version", "-v" -> {
-                    System.out.println("jelly-cli v0.1.0");
+                    System.out.println("jelly-tui v" + getVersion());
                     return;
                 }
                 case "--logout" -> {
@@ -112,6 +114,17 @@ public class Main {
             System.exit(1);
         }
         return config;
+    }
+
+    private static String getVersion() {
+        try (InputStream in = Main.class.getResourceAsStream("/version.properties")) {
+            if (in == null) return "dev";
+            Properties props = new Properties();
+            props.load(in);
+            return props.getProperty("version", "dev");
+        } catch (IOException e) {
+            return "dev";
+        }
     }
 
     private static void printHelp() {
